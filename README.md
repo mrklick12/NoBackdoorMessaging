@@ -3,6 +3,6 @@ A self-hosted, end-to-end encrypted messenger where even the relay server that r
 
 How to run your node in terminal from root directory:
 
-$env:NODE_HOME="./alice_data"
-$env:PORT="5000"
+$env:NODE_HOME="./eva_data"
+$env:PORT="5002"
 python node/node.py

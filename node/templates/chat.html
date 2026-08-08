@@ -2,37 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ username }}'s chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ username }} &middot; NoBackdoorMessaging</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
 </head>
-<body>
-  <h1>NoBackdoorMessaging</h1>
-  <h4>Signed in as {{ username }}</h4>
+<body class="app-body">
 
-  <h3 class="error">
-    {% if error %}
-            {{ error }}
-    {% endif %}
-    </h3>
+  <canvas id="ascii-bg" data-quiet></canvas>
 
-  <div>
-    {% for name in logs %}
-      <a href="/conversation/{{ name }}" style="display:block; width:300px; padding:12px; margin-bottom:8px; border:1px solid #444; text-decoration:none; color:inherit;">
-        {{ name }}
-      </a>
-    {% endfor %}
-  </div>
+  <main class="app">
 
-  <form method="POST" action="/send">
-    <input type="text" name="to" placeholder="Username to message" required>
-    <input type="text" name="message" placeholder="Your message" required>
-    <button type="submit">Send</button>
-  </form>
+    <header class="app-head">
+      <div class="avatar">{{ username[0] if username else "?" }}</div>
+      <div class="app-head-main">
+        <h1 class="app-title">{{ username }}</h1>
+        <p class="app-sub"><span class="lock">&#9679;</span> keys held locally</p>
+      </div>
+      <div class="app-head-actions">
+        <form class="inline-form" method="POST" action="/collect">
+          <input type="hidden" name="isHomeScreen" value="y">
+          <button class="btn-icon" type="submit">&#8635; REFRESH</button>
+        </form>
+        <a class="btn-icon" href="/">EXIT</a>
+      </div>
+    </header>
 
-  <form method="POST" action="/collect">
-    <input type="hidden" name="isHomeScreen" value="y">
-    <button type="submit">Refresh all messages</button>
-  </form>
+    <div class="app-scroll">
+      {% if error %}
+        <p class="form-error">{{ error }}</p>
+      {% endif %}
 
+      <p class="section-label">CONVERSATIONS</p>
 
+      {% if logs %}
+        <div class="convo-list">
+          {% for name in logs %}
+            <a class="convo-row" href="/conversation/{{ name }}">
+              <div class="avatar">{{ name[0] }}</div>
+              <div class="convo-meta">
+                <div class="convo-name">{{ name }}</div>
+                <div class="convo-hint">end-to-end encrypted</div>
+              </div>
+              <span class="convo-go">&rsaquo;</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          No conversations yet.<br>
+          Send a message below to start one.
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="new-convo">
+      <form method="POST" action="/send">
+        <p class="section-label">NEW MESSAGE</p>
+        <div class="new-convo-inputs">
+          <input type="text" name="to" placeholder="username" autocomplete="off" required>
+          <input type="text" name="message" placeholder="message" autocomplete="off" required>
+        </div>
+        <input type="hidden" name="isHomeScreen" value="y">
+        <button class="btn btn-primary btn-block" type="submit">SEND</button>
+      </form>
+    </div>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='js/ascii-bg.js') }}"></script>
 </body>
 </html>

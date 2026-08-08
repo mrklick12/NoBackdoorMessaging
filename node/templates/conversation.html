@@ -2,42 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Chat with {{ contact }}</title>
-  <style>
-    .thread { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
-    .bubble { max-width:60%; padding:10px 14px; border-radius:12px; }
-    .bubble-me { background:#2563eb; color:#fff; align-self:flex-end; }
-    .bubble-them { background:#eee; color:#000; align-self:flex-start; }
-    .bubble-meta { font-size:11px; opacity:0.7; margin-top:4px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ contact }} &middot; NoBackdoorMessaging</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
 </head>
-<body>
-  <h1>Chat with {{ contact }}</h1>
-  <a href="/chat">&larr; Back to conversations</a>
+<body class="app-body">
 
-  <div class="thread">
-    {% for message in messages %}
-      {% set is_me = message.sender == username %}
-      <div class="bubble {{ 'bubble-me' if is_me else 'bubble-them' }}">
-        <div>{{ message.content }}</div>
-        <div class="bubble-meta">{{ message.sender }} &middot; {{ message.timestamp }}</div>
+  <canvas id="ascii-bg" data-quiet></canvas>
+
+  <main class="app">
+
+    <header class="app-head">
+      <a class="btn-icon" href="/chat">&larr;</a>
+      <div class="avatar">{{ contact[0] if contact else "?" }}</div>
+      <div class="app-head-main">
+        <h1 class="app-title">{{ contact }}</h1>
+        <p class="app-sub"><span class="lock">&#9679;</span> end-to-end encrypted</p>
       </div>
-    {% else %}
-      <p>No messages yet. Say hi to {{ contact }}.</p>
-    {% endfor %}
-  </div>
+      <div class="app-head-actions">
+        <form class="inline-form" method="POST" action="/collect">
+          <input type="hidden" name="isHomeScreen" value="n">
+          <input type="hidden" name="toUser" value="{{ contact }}">
+          <button class="btn-icon" type="submit">&#8635; REFRESH</button>
+        </form>
+      </div>
+    </header>
 
-  <form method="POST" action="/send" style="margin-top:20px;">
-    <input type="hidden" name="to" value="{{ contact }}">
-    <input type="text" name="message" placeholder="Message {{ contact }}" required>
-    <input type="hidden" name="isHomeScreen" value="n">
-    <button type="submit">Send</button>
-  </form>
+    <div class="app-scroll" id="thread-scroll">
+      <div class="thread">
+        {% for message in messages %}
+          {#- the route passes `contact` but not our own username, so identify
+              ourselves as "whoever is not the contact". Compared lowercase
+              because log filenames are lowercased while senders keep case. -#}
+          {% set is_me = message.sender|lower != contact|lower %}
+          <div class="msg {{ 'msg-me' if is_me else 'msg-them' }}">
+            <div class="bubble">{{ message.content }}</div>
+            <div class="msg-time">{{ message.timestamp }}</div>
+          </div>
+        {% else %}
+          <p class="thread-empty">
+            No messages yet.<br>
+            Anything you send is encrypted before it leaves this device.
+          </p>
+        {% endfor %}
+      </div>
+    </div>
 
-  <form method="POST" action="/collect">
-    <input type="hidden" name="isHomeScreen" value="n">
-    <input type="hidden" name="toUser" value="{{ contact }}">
-    <button type="submit">Refresh all messages</button>
-  </form>
+    <form class="composer" method="POST" action="/send">
+      <input type="hidden" name="to" value="{{ contact }}">
+      <input type="hidden" name="isHomeScreen" value="n">
+      <input
+        type="text"
+        name="message"
+        placeholder="Message {{ contact }}"
+        autocomplete="off"
+        autofocus
+        required
+      >
+      <button class="btn btn-primary" type="submit">SEND</button>
+    </form>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='js/ascii-bg.js') }}"></script>
+  <script>
+    // land on the newest message, like any messenger
+    (function () {
+      var s = document.getElementById("thread-scroll");
+      if (s) s.scrollTop = s.scrollHeight;
+    })();
+  </script>
 </body>
 </html>

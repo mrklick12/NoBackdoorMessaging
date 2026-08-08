@@ -3,25 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <title>Register &middot; NoBackdoorMessaging</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
 </head>
-<body class="setup-page">
-  <main class="setup-card">
-    <h1 class="registerH">Register</h1>
-    <p class="subtitle">
-      This generates an RSA keypair on this machine and registers your public key
-      with the relay. Your private key never leaves this device.
-    </p>
+<body class="auth-body">
 
-  <form method="POST" action="/register">
-    <label for="username">Choose a username</label>
-    <input type="text" id="username" name="username" required>
-    <input type="hidden" name="isHomeScreen" value="y">
-    
-    <button type="submit">Go</button>
-  </form>
+  <canvas id="ascii-bg" data-quiet></canvas>
 
+  <main class="auth">
+    <div class="card">
+      <div class="card-bar">
+        <span class="card-bar-dots"><i></i><i></i><i></i></span>
+        <span class="card-bar-title">REGISTER</span>
+      </div>
+
+      <div class="card-body">
+        <h1 class="auth-title">Create identity</h1>
+
+        <p class="auth-note">
+          An RSA keypair is generated <strong>on this machine</strong>. Only the
+          public half is sent to the relay, your private key never leaves
+          this device.
+        </p>
+
+        {% if error %}
+          <p class="form-error">{{ error }}</p>
+        {% endif %}
+
+        <form class="auth-form" method="POST" action="/register">
+          <div class="field">
+            <label for="username">CHOOSE A USERNAME</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="e.g. alice"
+              autocomplete="off"
+              autofocus
+              required
+            >
+          </div>
+
+          <input type="hidden" name="isHomeScreen" value="y">
+
+          <button class="btn btn-primary btn-block" type="submit">GENERATE KEYS</button>
+        </form>
+
+        <p class="auth-alt">Already have an identity? <a href="/login">LOG IN</a></p>
+      </div>
+    </div>
+
+    <a class="back-link" href="/">&larr; BACK</a>
   </main>
+
+  <script src="{{ url_for('static', filename='js/ascii-bg.js') }}"></script>
 </body>
 </html>

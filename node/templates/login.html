@@ -3,28 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <title>Login &middot; NoBackdoorMessaging</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
 </head>
-<body class="setup-page">
-  <main class="setup-card">
-    <h1 class="registerH">Login</h1>
-    <p class="subtitle">
-      Log in to your logs and messages here! Enter your username below:
-    </p>
+<body class="auth-body">
 
-    <h3 class="error">
-    {% if error %}
-            {{ error }}
-    {% endif %}
-    </h3>
+  <canvas id="ascii-bg" data-quiet></canvas>
 
-  <form method="POST" action="/login">
-    <label for="username">Enter username:</label>
-    <input type="text" id="username" name="username" required>
-    <button type="submit">Go</button>
-  </form>
+  <main class="auth">
+    <div class="card">
+      <div class="card-bar">
+        <span class="card-bar-dots"><i></i><i></i><i></i></span>
+        <span class="card-bar-title">LOGIN</span>
+      </div>
 
+      <div class="card-body">
+        <h1 class="auth-title">Open your logs</h1>
+
+        <p class="auth-note">
+          Works only on the device you registered from,
+          <strong>your private key never left it</strong>, so there is nothing
+          to download and nothing to intercept.
+        </p>
+
+        {% if error %}
+          <p class="form-error">{{ error }}</p>
+        {% endif %}
+
+        <form class="auth-form" method="POST" action="/login">
+          <div class="field">
+            <label for="username">ENTER YOUR USERNAME</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="e.g. alice"
+              autocomplete="off"
+              autofocus
+              required
+            >
+          </div>
+
+          <button class="btn btn-primary btn-block" type="submit">CONTINUE</button>
+        </form>
+
+        <p class="auth-alt">No identity yet? <a href="/register">REGISTER</a></p>
+      </div>
+    </div>
+
+    <a class="back-link" href="/">&larr; BACK</a>
   </main>
+
+  <script src="{{ url_for('static', filename='js/ascii-bg.js') }}"></script>
 </body>
 </html>

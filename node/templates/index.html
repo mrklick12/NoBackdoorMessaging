@@ -2,12 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NoBackdoorMessaging</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
 </head>
-<body>
-  <div style="display:flex; justify-content:center; align-items:center; height:100vh; gap:20px;">
-    <a href="/register"><button>Register</button></a>
-    <a href="/login"><button>Login</button></a>
-  </div>
+<body class="landing-body">
+
+  <!-- scene is generated procedurally in ascii-bg.js, so it fills any viewport -->
+  <canvas id="ascii-bg"></canvas>
+
+  <main class="landing">
+    <h1 class="logo">
+      <span class="logo-line">NoBackdoor</span>
+      <span class="logo-line logo-line-accent">Messaging</span>
+    </h1>
+
+    <p class="tagline">
+      End-to-end encrypted. Self-hosted.<br>
+      The relay <span class="hot">cannot read your messages</span>,
+      it never holds the keys.
+    </p>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="/register">REGISTER</a>
+      <a class="btn" href="/login">LOGIN</a>
+    </div>
+  </main>
+
+  <p class="landing-foot">no central operator &middot; no keys to seize &middot; no backdoor to build</p>
+
+  <script src="{{ url_for('static', filename='js/ascii-bg.js') }}"></script>
 </body>
 </html>

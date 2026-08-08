@@ -1,0 +1,699 @@
+/* ============================================================
+   NoBackdoorMessaging — dark / pixel theme
+   Shared design tokens + components.
+   ============================================================ */
+
+:root {
+  --bg:          #07080c;
+  --bg-panel:    #0e1017;
+  --bg-raised:   #141826;
+  --border:      #232838;
+  --border-hot:  #3ca6ff;
+
+  --text:        #e6e9f2;
+  --text-dim:    #7d879c;
+  --text-faint:  #4a5266;
+
+  --accent:      #3ca6ff;
+  --accent-deep: #1b6fd0;
+  --danger:      #ff5c5c;
+
+  --pixel: 'Press Start 2P', ui-monospace, 'Courier New', monospace;
+  --mono:  ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+
+  --shadow-hard: 4px 4px 0 #000;
+  --shadow-hard-sm: 2px 2px 0 #000;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* ---------- pixel button ---------- */
+
+.btn {
+  display: inline-block;
+  font-family: var(--pixel);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 1px;
+  padding: 17px 24px;
+  color: var(--text);
+  background: var(--bg-panel);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-hard);
+  text-decoration: none;
+  cursor: pointer;
+  /* steps() keeps the motion chunky rather than smooth — reads as "pixel" */
+  transition: transform .09s steps(2), box-shadow .09s steps(2),
+              border-color .09s steps(2), color .09s steps(2);
+}
+
+.btn:hover,
+.btn:focus-visible {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-hard-sm);
+  border-color: var(--border-hot);
+  color: var(--accent);
+  outline: none;
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 #000;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #04121f;
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: #63b9ff;
+  border-color: #63b9ff;
+  color: #04121f;
+}
+
+/* ---------- landing ---------- */
+
+.landing-body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+#ascii-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+}
+
+.landing {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  padding: 24px;
+  text-align: center;
+}
+
+/* The horizon glow sits directly behind the buttons — this scrim keeps text
+   readable without flattening the scene at the edges. */
+.landing::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 62% 48% at 50% 48%,
+    rgba(5, 7, 12, .82) 0%,
+    rgba(5, 7, 12, .58) 45%,
+    rgba(5, 7, 12, .10) 78%,
+    rgba(5, 7, 12, 0) 100%
+  );
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: var(--pixel);
+  line-height: 1.1;
+}
+
+.logo-line {
+  font-size: clamp(17px, 5vw, 44px);
+  letter-spacing: 2px;
+  color: var(--text);
+  text-shadow:
+    0 0 24px rgba(60, 166, 255, .35),
+    3px 3px 0 #000;
+}
+
+.logo-line-accent {
+  color: var(--accent);
+  text-shadow:
+    0 0 28px rgba(60, 166, 255, .55),
+    3px 3px 0 #000;
+}
+
+.tagline {
+  margin: 0;
+  max-width: 46ch;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.85;
+  letter-spacing: .04em;
+  color: #fff;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, .38),
+    0 0 26px rgba(255, 255, 255, .16);
+}
+
+.tagline .hot {
+  color: var(--accent);
+  text-shadow:
+    0 0 10px rgba(60, 166, 255, .55),
+    0 0 26px rgba(60, 166, 255, .22);
+}
+
+.actions {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.landing-foot {
+  position: fixed;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ---------- auth pages (register / login) ----------
+   Same theme as the landing page, deliberately calmer: the background runs in
+   data-quiet mode and the form sits on a solid card so it never lands on
+   moving dots. Exactly one glowing element per page — the title. */
+
+.auth-body {
+  min-height: 100vh;
+}
+
+.auth {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 430px;
+  background: var(--bg-panel);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-hard);
+}
+
+/* little terminal-window chrome strip */
+.card-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-raised);
+  border-bottom: 2px solid var(--border);
+}
+
+.card-bar-dots { display: flex; gap: 5px; }
+
+.card-bar-dots i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: var(--border);
+}
+
+.card-bar-title {
+  font-family: var(--pixel);
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+.card-body {
+  padding: 28px 26px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-title {
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: clamp(13px, 3.4vw, 16px);
+  line-height: 1.5;
+  color: var(--accent);
+  text-shadow:
+    0 0 18px rgba(60, 166, 255, .50),
+    2px 2px 0 #000;
+}
+
+.auth-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--text-dim);
+}
+
+.auth-note strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ---------- form ---------- */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.field label {
+  font-family: var(--pixel);
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: var(--text-dim);
+}
+
+/* Deliberately NOT the pixel font — it is painful to type into and hard to
+   read at input sizes. Monospace keeps the theme without the cost. */
+.field input {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  padding: 13px 14px;
+  outline: none;
+  transition: border-color .09s steps(2), box-shadow .09s steps(2);
+}
+
+.field input::placeholder { color: var(--text-faint); }
+
+.field input:focus {
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 0 0 1px rgba(60, 166, 255, .35),
+    0 0 16px rgba(60, 166, 255, .22);
+}
+
+.btn-block {
+  width: 100%;
+  text-align: center;
+}
+
+/* ---------- error ---------- */
+
+.form-error {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 11px 13px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--danger);
+  background: rgba(255, 92, 92, .09);
+  border: 2px solid rgba(255, 92, 92, .45);
+}
+
+.form-error::before {
+  content: "[!]";
+  font-family: var(--pixel);
+  font-size: 9px;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+/* ---------- footers / links ---------- */
+
+.auth-alt {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: .03em;
+  color: var(--text-faint);
+}
+
+.auth-alt a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(60, 166, 255, .35);
+}
+
+.auth-alt a:hover { color: #7cc4ff; border-bottom-color: #7cc4ff; }
+
+.back-link {
+  position: relative;
+  z-index: 1;
+  font-family: var(--pixel);
+  font-size: 8px;
+  letter-spacing: 1.4px;
+  color: var(--text-faint);
+  text-decoration: none;
+}
+
+.back-link:hover { color: var(--accent); }
+
+/* ============================================================
+   app pages (conversation list + thread)
+   ============================================================ */
+
+.app-body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* semi-opaque shell so the quiet background reads at the edges but never
+   sits behind text */
+.app {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: rgba(7, 8, 12, .86);
+  border-left: 2px solid var(--border);
+  border-right: 2px solid var(--border);
+}
+
+.app-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--bg-panel);
+  border-bottom: 2px solid var(--border);
+}
+
+.app-head-main { min-width: 0; }
+
+.app-title {
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-sub {
+  margin: 5px 0 0;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.app-sub .lock { color: var(--accent); }
+
+.app-head-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* small square icon-ish button, same pixel language as .btn */
+.btn-icon {
+  font-family: var(--pixel);
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 11px 12px;
+  color: var(--text-dim);
+  background: var(--bg-raised);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-hard-sm);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .09s steps(2), box-shadow .09s steps(2),
+              border-color .09s steps(2), color .09s steps(2);
+}
+
+.btn-icon:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.inline-form { display: inline; }
+
+/* ---------- scrollable body ---------- */
+
+.app-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.app-scroll::-webkit-scrollbar { width: 10px; }
+.app-scroll::-webkit-scrollbar-track { background: transparent; }
+.app-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border: 2px solid var(--bg);
+}
+.app-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent-deep); }
+
+.section-label {
+  margin: 0 0 12px;
+  font-family: var(--pixel);
+  font-size: 8px;
+  letter-spacing: 1.6px;
+  color: var(--text-faint);
+}
+
+/* ---------- conversation list ---------- */
+
+.convo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.convo-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 14px;
+  background: var(--bg-panel);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-hard-sm);
+  text-decoration: none;
+  color: var(--text);
+  transition: transform .09s steps(2), box-shadow .09s steps(2),
+              border-color .09s steps(2);
+}
+
+.convo-row:hover {
+  border-color: var(--accent);
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #000;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg-raised);
+  border: 2px solid var(--border);
+  font-family: var(--pixel);
+  font-size: 12px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.convo-row:hover .avatar { border-color: var(--accent); }
+
+.convo-meta { min-width: 0; }
+
+.convo-name {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.convo-hint {
+  margin-top: 3px;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.convo-go {
+  margin-left: auto;
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.convo-row:hover .convo-go { color: var(--accent); }
+
+.empty-state {
+  padding: 26px 18px;
+  border: 2px dashed var(--border);
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+/* ---------- new conversation panel ---------- */
+
+.new-convo {
+  padding: 16px 18px;
+  background: var(--bg-panel);
+  border-top: 2px solid var(--border);
+}
+
+.new-convo form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.new-convo-inputs { display: flex; gap: 10px; }
+
+.new-convo-inputs input { flex: 1; min-width: 0; }
+
+/* shared input look for app pages */
+.app input[type="text"] {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  padding: 12px 13px;
+  outline: none;
+  transition: border-color .09s steps(2), box-shadow .09s steps(2);
+}
+
+.app input[type="text"]::placeholder { color: var(--text-faint); }
+
+.app input[type="text"]:focus {
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 0 0 1px rgba(60, 166, 255, .35),
+    0 0 16px rgba(60, 166, 255, .22);
+}
+
+/* ---------- message thread ---------- */
+
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 74%;
+}
+
+.msg-them { align-self: flex-start; align-items: flex-start; }
+.msg-me   { align-self: flex-end;   align-items: flex-end; }
+
+.bubble {
+  padding: 11px 14px;
+  border: 2px solid;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* receiver — dark panel */
+.msg-them .bubble {
+  background: var(--bg-raised);
+  border-color: var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+/* sender — accent, same language as the primary button */
+.msg-me .bubble {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #04121f;
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.msg-time {
+  margin-top: 5px;
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--text-faint);
+}
+
+.thread-empty {
+  margin: auto;
+  padding: 30px 18px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--text-dim);
+}
+
+/* ---------- composer ---------- */
+
+.composer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg-panel);
+  border-top: 2px solid var(--border);
+}
+
+.composer input[type="text"] { flex: 1; min-width: 0; }
+
+@media (max-width: 480px) {
+  .btn { font-size: 9px; padding: 15px 18px; }
+  .actions { gap: 12px; }
+  .card-body { padding: 22px 18px 20px; }
+  .msg { max-width: 88%; }
+  .new-convo-inputs { flex-direction: column; }
+}
