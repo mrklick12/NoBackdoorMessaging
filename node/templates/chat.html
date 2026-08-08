@@ -14,26 +14,24 @@
     {% endif %}
     </h3>
 
+  <div>
+    {% for name in logs %}
+      <a href="/conversation/{{ name }}" style="display:block; width:300px; padding:12px; margin-bottom:8px; border:1px solid #444; text-decoration:none; color:inherit;">
+        {{ name }}
+      </a>
+    {% endfor %}
+  </div>
+
   <form method="POST" action="/send">
     <input type="text" name="to" placeholder="Username to message" required>
     <input type="text" name="message" placeholder="Your message" required>
     <button type="submit">Send</button>
   </form>
 
-  <a href="/collect"><button>See Messages</button></a>
-
-      <p>
-        {% if messages %}
-      <ul>
-        {% for message in messages %}
-          <li><strong>{{ message[0] }}:</strong> {{ message[1] }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>No messages yet.</p>
-    {% endif %}
-
-      </p>
+  <form method="POST" action="/collect">
+    <input type="hidden" name="isHomeScreen" value="y">
+    <button type="submit">Refresh all messages</button>
+  </form>
 
 
 </body>

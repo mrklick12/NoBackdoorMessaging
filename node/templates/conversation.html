@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat with {{ contact }}</title>
+  <style>
+    .thread { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+    .bubble { max-width:60%; padding:10px 14px; border-radius:12px; }
+    .bubble-me { background:#2563eb; color:#fff; align-self:flex-end; }
+    .bubble-them { background:#eee; color:#000; align-self:flex-start; }
+    .bubble-meta { font-size:11px; opacity:0.7; margin-top:4px; }
+  </style>
+</head>
+<body>
+  <h1>Chat with {{ contact }}</h1>
+  <a href="/chat">&larr; Back to conversations</a>
+
+  <div class="thread">
+    {% for message in messages %}
+      {% set is_me = message.sender == username %}
+      <div class="bubble {{ 'bubble-me' if is_me else 'bubble-them' }}">
+        <div>{{ message.content }}</div>
+        <div class="bubble-meta">{{ message.sender }} &middot; {{ message.timestamp }}</div>
+      </div>
+    {% else %}
+      <p>No messages yet. Say hi to {{ contact }}.</p>
+    {% endfor %}
+  </div>
+
+  <form method="POST" action="/send" style="margin-top:20px;">
+    <input type="hidden" name="to" value="{{ contact }}">
+    <input type="text" name="message" placeholder="Message {{ contact }}" required>
+    <input type="hidden" name="isHomeScreen" value="n">
+    <button type="submit">Send</button>
+  </form>
+
+  <form method="POST" action="/collect">
+    <input type="hidden" name="isHomeScreen" value="n">
+    <input type="hidden" name="toUser" value="{{ contact }}">
+    <button type="submit">Refresh all messages</button>
+  </form>
+</body>
+</html>

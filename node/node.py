@@ -1,7 +1,7 @@
 """
 NoBackdoorMessaging.
 """
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
@@ -13,6 +13,7 @@ import requests
 import os
 import json
 import base64
+import time
 
 app = Flask(__name__) # Flask website Class
 
@@ -21,11 +22,32 @@ os.makedirs(os.path.join(NODE_HOME, "keys"), exist_ok=True)
 os.makedirs(os.path.join(NODE_HOME, "logs"), exist_ok=True)
 
 PRIVATE_KEY_PATH = os.path.join(NODE_HOME, "keys", "private_key.pem")
+LOGS_PATH = os.path.join(NODE_HOME, "logs")
 
 def get_my_username():
     with open(os.path.join(NODE_HOME, "config.json")) as f:
         return json.load(f)["username"]
 
+def get_logs():
+    files = os.listdir(LOGS_PATH)
+    logs_paths = []
+    for file in files:
+        logs_paths.append(os.path.join(LOGS_PATH, file))
+    return logs_paths
+
+def get_log_names():
+    files = os.listdir(LOGS_PATH)
+    names = []
+
+    for file in files:
+        file = file[:-5]
+        name1, name2 = file.split("_")
+        if name1 == get_my_username():
+            names.append(name2)
+        else:
+            names.append(name1)
+    return names
+            
 
 def decrypt_messages(messages):
     with open(PRIVATE_KEY_PATH, "rb") as f:
@@ -47,9 +69,31 @@ def decrypt_messages(messages):
         plaintext_bytes = aesgcm.decrypt(nonce, ciphertext, None)
         plaintext = plaintext_bytes.decode("utf-8")
 
-        clean_messages.append((message["from"], plaintext))
+        clean_messages.append((message["from"], plaintext, message["timestamp"]))
 
     return clean_messages
+
+def append_message(filepath, new_message, timestamp, sender):
+    if os.path.exists(filepath):
+        with open(filepath, "r") as f:
+            messages = json.load(f)
+    else:
+        messages = []
+
+    messages.append({
+        "sender": sender,
+        "timestamp": timestamp,
+        "content": new_message })
+
+    with open(filepath, "w") as f:
+        json.dump(messages, f, indent=4)
+
+def read_json_messages(filename):
+        with open(filename, "r") as f:
+            messages = json.load(f)
+        return messages
+
+
 
         
 
@@ -101,7 +145,7 @@ def register():
 
 
     if result["login"]:
-        return render_template("chat.html", username=username)
+        return render_template("chat.html", username=username, logs=get_log_names())
     else:
         return render_template("setup.html")
 
@@ -114,7 +158,7 @@ def login():
     result = response.json()
 
     if result["userExists"]:
-        return render_template("chat.html", username=username)
+        return render_template("chat.html", username=username, logs=get_log_names())
     else:
         return render_template("login.html", error=f"No user registered called {username} ")
     
@@ -122,7 +166,14 @@ def login():
 @app.route("/send", methods=["POST"])
 def send():
     toUser = request.form["to"]
-    plaintext = request.form["message"].encode("utf-8")
+
+    message_text = request.form["message"]
+    plaintext = message_text.encode("utf-8")
+
+    if request.form["isHomeScreen"] == "y":
+        isHomeScreen = True
+    else:
+        isHomeScreen = False
 
     pubkey_response = requests.get(f"http://localhost:6000/pubkey/{toUser}")
     result = pubkey_response.json()
@@ -150,6 +201,7 @@ def send():
             algorithm=hashes.SHA256(),
             label=None))
     
+    timestamp = time.strftime("%Y-%m-%d %H:%M", time.localtime())
 
     ciphertext_b64 = base64.b64encode(ciphertext).decode("utf-8")
     encrypted_aes_key_b64 = base64.b64encode(encrypted_aes_key).decode("utf-8")
@@ -159,24 +211,71 @@ def send():
                           data={"from": get_my_username(),
                                 "ciphertext": ciphertext_b64,
                                 "encrypted_aes_key": encrypted_aes_key_b64,
-                                "nonce": nonce_b64})
+                                "nonce": nonce_b64,
+                                "timestamp" : timestamp})
     result = response.json()
 
+    first, second = sorted([get_my_username().lower(), toUser.lower()])
+    filename = f"{first}_{second}.json"
+    filepath = os.path.join(LOGS_PATH, filename)
+
+    
+
+    append_message(filepath, message_text, timestamp, get_my_username())
+
+
     if result["ok"]:
-        return render_template("chat.html", username=get_my_username())
+        if isHomeScreen:
+            return redirect(url_for("chat"))
+        elif not isHomeScreen:
+            return render_template("conversation.html", messages=read_json_messages(filepath), contact=toUser)
     else:
-        return render_template("chat.html", error="an error occured")
+        return render_template("chat.html", error="an error occured",logs=get_log_names())
 
+@app.route("/chat")
+def chat():
+    username = get_my_username()
+    return render_template("chat.html", username=username, logs=get_log_names())
 
-@app.route("/collect", methods=["GET", "POST"])
+@app.route("/collect", methods=["POST"])
 def collect():
     username = get_my_username()
+
+    if request.form["isHomeScreen"] == "y":
+            isHomeScreen = True
+    else:
+            isHomeScreen = False
+            toUser = request.form["toUser"]
+
     response = requests.post(f"http://localhost:6000/collect/{username}")
     messages = response.json()["messages"]
 
     clean_messages = decrypt_messages(messages)
 
-    return render_template("chat.html", username=username, messages=clean_messages)
+
+    for message in clean_messages:
+        first, second = sorted([get_my_username().lower(), message[0].lower()])
+        filename = f"{first}_{second}.json"
+        append_message(os.path.join(LOGS_PATH, filename), message[1], message[2], message[0])
+
+    if isHomeScreen:
+        return render_template("chat.html", username=username, logs=get_log_names())
+    else:
+        return redirect(f"conversation/{toUser}")
+
+
+@app.route("/conversation/<username>")
+def conversation(username):
+    first, second = sorted([get_my_username().lower(), username.lower()])
+    filename = f"{first}_{second}.json"
+    logsfile = os.path.join(LOGS_PATH, filename)
+
+    return render_template("conversation.html", messages=read_json_messages(logsfile), contact=username)
+
+
+
+
+    
 
 
 

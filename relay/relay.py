@@ -88,7 +88,8 @@ def dropoff(username):
             "from" : request.form["from"],
             "ciphertext" : request.form["ciphertext"],
             "encrypted_aes_key": request.form["encrypted_aes_key"],
-            "nonce" : request.form["nonce"]
+            "nonce" : request.form["nonce"],
+            "timestamp" : request.form["timestamp"]
         }
     )
     return {"ok":True}
