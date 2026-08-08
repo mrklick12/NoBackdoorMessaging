@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ username }} — node</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="chat-page" data-username="{{ username }}" data-active-contact="{{ active_contact or '' }}">
+  <div class="chat-layout">
+
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="me-label">signed in as</span>
+        <span class="me-username">{{ username }}</span>
+      </div>
+
+      <form id="new-convo-form" class="new-convo-form">
+        <input
+          type="text"
+          id="new-convo-username"
+          placeholder="Start chat with..."
+          autocomplete="off"
+          required
+        >
+        <button type="submit" title="Start conversation">+</button>
+      </form>
+      <p id="new-convo-error" class="error inline-error hidden"></p>
+
+      <nav class="contact-list" id="contact-list">
+        {% for contact in contacts %}
+          <a
+            href="{{ url_for('chat', with=contact) }}"
+            class="contact {{ 'active' if contact == active_contact else '' }}"
+            data-contact="{{ contact }}"
+          >{{ contact }}</a>
+        {% else %}
+          <p class="empty-hint">No conversations yet. Start one above.</p>
+        {% endfor %}
+      </nav>
+    </aside>
+
+    <section class="thread-panel">
+      {% if active_contact %}
+        <header class="thread-header">
+          <h2>{{ active_contact }}</h2>
+          <button id="refresh-btn" type="button" title="Check relay for new messages">
+            &#8635; Refresh
+          </button>
+        </header>
+
+        <div class="thread" id="thread">
+          {% for m in messages %}
+            <div class="message {{ 'from-me' if m.sender == username else 'from-them' }}">
+              <div class="message-bubble">
+                <p class="message-content">{{ m.content }}</p>
+                <span class="message-meta">{{ m.sender }} · {{ m.timestamp }}</span>
+              </div>
+            </div>
+          {% else %}
+            <p class="empty-hint centered">No messages yet. Say hi.</p>
+          {% endfor %}
+        </div>
+
+        <form id="send-form" class="send-form">
+          <textarea
+            id="message-input"
+            placeholder="Type a message..."
+            required
+          ></textarea>
+          <button type="submit">Send</button>
+        </form>
+        <p id="send-error" class="error inline-error hidden"></p>
+      {% else %}
+        <div class="no-conversation">
+          <p>Select a conversation, or start a new one on the left.</p>
+        </div>
+      {% endif %}
+    </section>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>

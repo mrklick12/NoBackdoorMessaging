@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="static/main.css">
+</head>
+<body class="setup-page">
+  <main class="setup-card">
+    <h1 class="registerH">Register</h1>
+    <p class="subtitle">
+      This generates an RSA keypair on this machine and registers your public key
+      with the relay. Your private key never leaves this device.
+    </p>
+
+  <form method="POST" action="/register">
+    <label for="username">Choose a username</label>
+    <input type="text" id="username" name="username" required>
+    <button type="submit">Go</button>
+  </form>
+
+  </main>
+</body>
+</html>
