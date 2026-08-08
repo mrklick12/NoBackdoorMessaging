@@ -4,18 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link rel="stylesheet" href="static/main.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body class="setup-page">
   <main class="setup-card">
     <h1 class="registerH">Login</h1>
     <p class="subtitle">
       Log in to your logs and messages here! Enter your username below:
+    </p>
+
+    <h3 class="error">
     {% if error %}
             {{ error }}
     {% endif %}
-
-    </p>
+    </h3>
 
   <form method="POST" action="/login">
     <label for="username">Enter username:</label>

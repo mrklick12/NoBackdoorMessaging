@@ -16,6 +16,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # initialize the app with Flask-SQLAlchemy
 db.init_app(app)
 
+# this mailbox is where messages are dropped off
+# relay server has to be online
+# if relay server crashes or is turned off, all unrecieved messages will be lost
+mailbox = {} 
+
 """
 SYNTAX FOR DATABASE QURIES, ALWAYS TRY AND EXCEPT
 try:
@@ -49,7 +54,6 @@ def register():
         existing.public_key = pubkey
     else:
         db.session.add(UserKeys(username=uname, public_key = pubkey))
-        print("SUCCESS!!")
     db.session.commit()
     return {"login": True}
 
@@ -66,12 +70,38 @@ def login():
 
 
 
-
 # returns the public key of a given username from db
 @app.route('/pubkey/<username>')
 def user(username):
-    return render_template("index.html")
-    
+    match = UserKeys.query.filter_by(username=username).first()
+    if match is None:
+        return {"public_key": None}
+    return {"public_key": match.public_key}
+
+
+@app.route('/dropoff/<username>', methods=["POST"])
+def dropoff(username):
+    if username not in mailbox:
+        mailbox[username] = []
+    mailbox[username].append(
+        {
+            "from" : request.form["from"],
+            "ciphertext" : request.form["ciphertext"],
+            "encrypted_aes_key": request.form["encrypted_aes_key"],
+            "nonce" : request.form["nonce"]
+        }
+    )
+    return {"ok":True}
+
+
+@app.route('/collect/<username>', methods=["POST"])
+def collect(username):
+    messages = mailbox.get(username, [])
+    mailbox[username] = []   # clear 'cache'
+
+    return {"messages": messages}
+
+
 
 if __name__ == '__main__':
     app.run(port=6000, debug=True)
