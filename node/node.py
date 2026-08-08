@@ -17,7 +17,15 @@ PRIVATE_KEY_PATH = os.path.join(NODE_HOME, "keys", "private_key.pem")
 
 @app.route('/')
 def main():
+    return render_template("index.html")
+
+@app.route("/register")
+def registerForm():
     return render_template("setup.html")
+
+@app.route("/login")
+def loginForm():
+    return render_template("login.html")
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -53,6 +61,20 @@ def register():
         return render_template("placeholder.html")
     else:
         return render_template("setup.html")
+
+@app.route("/login", methods=["POST"])
+def login():
+    username = request.form["username"]
+
+    response = requests.post("http://localhost:6000/login", 
+                      data={"username": username})
+    result = response.json()
+
+    if result["userExists"]:
+        return render_template("chat.html")
+    else:
+        return render_template("login.html", error=f"No user registered called {username} ")
+    
 
 
 if __name__ == "__main__":

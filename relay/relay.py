@@ -53,6 +53,19 @@ def register():
     db.session.commit()
     return {"login": True}
 
+@app.route("/login", methods=["POST"])
+def login():
+    uname = request.form["username"]
+    existing = UserKeys.query.filter_by(username=uname).first()
+
+    if existing:
+        return {"userExists": True}
+    else:
+        return {"userExists": False}
+
+
+
+
 
 # returns the public key of a given username from db
 @app.route('/pubkey/<username>')
