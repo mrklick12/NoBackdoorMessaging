@@ -108,6 +108,9 @@ def login():
     else:
         return {"userExists": False}
 
+@app.route("/storage")
+def storage():
+    return _load_mailboxes(MAILBOX_PATH)
 
 
 
