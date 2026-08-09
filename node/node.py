@@ -28,7 +28,7 @@ NBMSERVER_PATH = "https://nbmserver.onrender.com"
 
 def get_my_username():
     with open(os.path.join(NODE_HOME, "config.json")) as f:
-        return json.load(f)["username"]
+        return json.load(f)["username"].lower()
 
 def get_logs():
     files = os.listdir(LOGS_PATH)
@@ -181,7 +181,7 @@ def send():
     result = pubkey_response.json()
 
     if result["public_key"] == None:
-        return render_template("chat.html", error=f"No user registered {toUser}")
+        return render_template("chat.html", error=f"No user registered {toUser}", username=get_my_username(), logs=get_log_names())
 
     toUserPubKey = serialization.load_pem_public_key(result["public_key"].encode("utf-8"))
     
