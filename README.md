@@ -61,6 +61,9 @@ Beyond that, planned features include:
 - **Password-protected private keys**: encrypting the key at rest instead of storing it in plaintext on-device
 - **Multi-device support**
 
+<img width="1904" height="1016" alt="messagesexample" src="https://github.com/user-attachments/assets/e1a6c9bd-8910-4b03-a742-d6a8c5d07e04" />
+
+
 
 
 
