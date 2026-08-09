@@ -1,6 +1,7 @@
 # NoBackdoorMessaging
 #### A self-hosted, end-to-end encrypted messenger where even the relay server that routes messages between users is cryptographically incapable of reading them, so there's no central company for a government to legally pressure into building a backdoor.
 
+
 ## Inspiration
 
 Your data is never yours. Even services like WhatsApp, which boast about "end-to-end encryption", meaning they themselves cannot see your messages, still have access to metadata about your messages, including:
@@ -22,7 +23,7 @@ NoBackdoorMessaging is a Flask Python application that makes you keep all your d
 
 You can send a message to any user as long as you know their username. All your message logs are saved locally, and deleted off the relay server as soon as they're collected by the recipient. Once a message is sent and received, you get 100% privacy over its content.
 
-## How we built it
+## How it was built
 
 Upon registration, your username is stored in the server's database, and using Python's `cryptography` library, your RSA public key is generated and stored alongside it. Your private key is stored on-device and never leaves it.
 
@@ -30,21 +31,21 @@ I won't go into how RSA works here, but your messages are encrypted with the Adv
 
 The relay server is hosted on Render, a free web hosting service, so the server does not have to be run locally.
 
-## Challenges we ran into
+## Challenges 
 
 Server downtime was a major issue. When uploading the local relay server to Render, the free hosting provider NoBackdoorMessaging uses, we ran into the limitations of the free plan: the server would stop after a few minutes of inactivity. At the time, all messages were being stored in the project's memory, in a dictionary variable. This meant that if I sent a message to Alice and she didn't refresh within that few-minute window, she would never receive it.
 
 To fix this, I moved all messages into a `.json` file, so the server could pick up where it left off on restart. The harder problem was actually getting that change live and it took a lot of fiddling to get the right commit pushed, deployed, and working correctly on the Render server.
 
-## Accomplishments that we're proud of
+## Accomplishments 
 
 This is something I have never done before. I've been reading about cryptography recently and really wanted to build something meaningful and this project does both. Since it's a messaging app, the scope going forward is massive. There are a lot of directions I can take this given more time.
 
-## What we learned
+## What I learned
 
 I learned how to put all my cryptography theory into practice, which is an itch I've been wanting to scratch for a while. I also picked up a lot of styling tips for website design along the way. Beyond that, I learned how to build an end-to-end encrypted messaging app from scratch which is something I'd never come close to doing before. The relay server implementation stood out in particular: it started out running locally, and is now hosted on Render, a free web hosting service which means the server is no longer on-device, and is actually sitting on a server rack somewhere.
 
-## What's next for NoBackdoorMessaging
+## Future Plans
 
 The main thing I want to fix is having to manually refresh to check for new messages as there wasn't enough time to build automatic polling in the 48 hours given, but it's high on the list for next time.
 
@@ -55,6 +56,8 @@ Beyond that, planned features include:
 - **Blocking users**
 - **Password-protected private keys**: encrypting the key at rest instead of storing it in plaintext on-device
 - **Multi-device support**
+
+
 
 
 
