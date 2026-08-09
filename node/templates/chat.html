@@ -44,6 +44,9 @@
               <div class="avatar">{{ name[0] }}</div>
               <div class="convo-meta">
                 <div class="convo-name">{{ name }}</div>
+                {% if new_messages and name in new_messages %}
+                <div class="new-badge"><span class="new-badge-dot"></span>New message</div>
+                {% endif %}
                 <div class="convo-hint">end-to-end encrypted</div>
               </div>
               <span class="convo-go">&rsaquo;</span>

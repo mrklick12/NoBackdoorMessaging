@@ -562,6 +562,25 @@ body {
   color: var(--text-faint);
 }
 
+.new-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #3ce67a;
+}
+
+.new-badge-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  background: #3ce67a;
+  box-shadow: 0 0 6px rgba(60, 230, 122, .8);
+}
+
 .convo-go {
   margin-left: auto;
   font-family: var(--pixel);

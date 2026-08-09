@@ -253,15 +253,17 @@ def collect():
     messages = response.json()["messages"]
 
     clean_messages = decrypt_messages(messages)
+    new_messages_from = set()
 
 
     for message in clean_messages:
         first, second = sorted([get_my_username().lower(), message[0].lower()])
         filename = f"{first}_{second}.json"
         append_message(os.path.join(LOGS_PATH, filename), message[1], message[2], message[0])
+        new_messages_from.add(message[0])
 
     if isHomeScreen:
-        return render_template("chat.html", username=username, logs=get_log_names())
+        return render_template("chat.html", username=username, logs=get_log_names(), new_messages=new_messages_from)
     else:
         return redirect(f"conversation/{toUser}")
 
