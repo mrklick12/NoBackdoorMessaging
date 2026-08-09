@@ -24,6 +24,8 @@ os.makedirs(os.path.join(NODE_HOME, "logs"), exist_ok=True)
 PRIVATE_KEY_PATH = os.path.join(NODE_HOME, "keys", "private_key.pem")
 LOGS_PATH = os.path.join(NODE_HOME, "logs")
 
+NBMSERVER_PATH = "https://nbmserver.onrender.com"
+
 def get_my_username():
     with open(os.path.join(NODE_HOME, "config.json")) as f:
         return json.load(f)["username"]
@@ -129,7 +131,7 @@ def register():
     pem_string = pem_bytes.decode("utf-8") # turns bytes into string
 
 
-    response = requests.post("http://localhost:6000/register", 
+    response = requests.post(f"{NBMSERVER_PATH}/register", 
                   data={"username": username, "public_key": pem_string})
     result = response.json()
 
@@ -153,7 +155,7 @@ def register():
 def login():
     username = request.form["username"]
 
-    response = requests.post("http://localhost:6000/login", 
+    response = requests.post(f"{NBMSERVER_PATH}/login", 
                       data={"username": username})
     result = response.json()
 
@@ -175,7 +177,7 @@ def send():
     else:
         isHomeScreen = False
 
-    pubkey_response = requests.get(f"http://localhost:6000/pubkey/{toUser}")
+    pubkey_response = requests.get(f"{NBMSERVER_PATH}/pubkey/{toUser}")
     result = pubkey_response.json()
 
     if result["public_key"] == None:
@@ -207,7 +209,7 @@ def send():
     encrypted_aes_key_b64 = base64.b64encode(encrypted_aes_key).decode("utf-8")
     nonce_b64 = base64.b64encode(nonce).decode("utf-8")
 
-    response = requests.post(f"http://localhost:6000/dropoff/{toUser}",
+    response = requests.post(f"{NBMSERVER_PATH}/dropoff/{toUser}",
                           data={"from": get_my_username(),
                                 "ciphertext": ciphertext_b64,
                                 "encrypted_aes_key": encrypted_aes_key_b64,
@@ -247,7 +249,7 @@ def collect():
             isHomeScreen = False
             toUser = request.form["toUser"]
 
-    response = requests.post(f"http://localhost:6000/collect/{username}")
+    response = requests.post(f"{NBMSERVER_PATH}/collect/{username}")
     messages = response.json()["messages"]
 
     clean_messages = decrypt_messages(messages)
