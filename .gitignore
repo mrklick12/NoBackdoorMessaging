@@ -12,7 +12,6 @@ config.json
 
 # relay's public-key store and mailbox (both generated at runtime)
 relay/database.db
-relay/mailboxes.json
 instance/
 
 .venv/
