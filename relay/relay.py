@@ -69,6 +69,9 @@ def return_user_messages(filepath, toUser):
     messages = mailboxes.get(toUser, [])
     mailboxes[toUser] = [] # clear 'cache'
 
+    with open(filepath, "w") as f:
+        json.dump(mailboxes, f, indent=4)
+
 
     return messages
 
