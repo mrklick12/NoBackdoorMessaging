@@ -1,6 +1,8 @@
 # NoBackdoorMessaging
 #### A self-hosted, end-to-end encrypted messenger where even the relay server that routes messages between users is cryptographically incapable of reading them, so there's no central company for a government to legally pressure into building a backdoor.
 
+##### Images are included at the end.
+
 YouTube Walkthrough of the Project: https://youtu.be/FYE3b5eEam8
 
 <img width="1904" height="1016" alt="main" src="https://github.com/user-attachments/assets/3825ae7a-90b8-4b03-b198-221c1367af0d" />
