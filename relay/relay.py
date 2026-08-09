@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-import os
+import os, json
 
 db = SQLAlchemy() # database connector Class
 app = Flask(__name__) # Flask website Class
@@ -19,7 +19,7 @@ db.init_app(app)
 # this mailbox is where messages are dropped off
 # relay server has to be online
 # if relay server crashes or is turned off, all unrecieved messages will be lost
-mailbox = {} 
+MAILBOX_PATH = os.path.join(basedir, "mailboxes.json")
 
 """
 SYNTAX FOR DATABASE QURIES, ALWAYS TRY AND EXCEPT
@@ -32,6 +32,45 @@ except Exception as e:
         hed = '<h1>Something is broken.</h1>'
         return hed + error_text
 """
+
+def add_message_to_mailbox(filepath, toUser, sender, ciphertext, encrypted_key, nonce, timestamp):
+    if os.path.exists(filepath):
+        with open(filepath, "r") as f:
+            mailboxes = json.load(f)
+    else:
+        mailboxes = {}
+
+    if toUser not in mailboxes:
+        mailboxes[toUser] = []
+    mailboxes[toUser].append(
+        {
+        "from" : sender,
+        "ciphertext" : ciphertext,
+        "encrypted_aes_key": encrypted_key,
+        "nonce" : nonce,
+        "timestamp" : timestamp
+        }
+    )
+
+    with open(filepath, "w") as f:
+        json.dump(mailboxes, f, indent=4)
+
+    return True
+
+def return_user_messages(filepath, toUser):
+    if os.path.exists(filepath):
+        with open(filepath, "r") as f:
+            mailboxes = json.load(f)
+    else:
+        mailboxes = {}
+
+    messages = mailboxes.get(toUser, [])
+    mailboxes[toUser] = [] # clear 'cache'
+
+
+    return messages
+
+
 
 class UserKeys(db.Model):
     __tablename__ = "UserKeys"
@@ -79,30 +118,24 @@ def user(username):
     return {"public_key": match.public_key}
 
 
+
+
 @app.route('/dropoff/<username>', methods=["POST"])
 def dropoff(username):
-    if username not in mailbox:
-        mailbox[username] = []
-    mailbox[username].append(
-        {
-            "from" : request.form["from"],
-            "ciphertext" : request.form["ciphertext"],
-            "encrypted_aes_key": request.form["encrypted_aes_key"],
-            "nonce" : request.form["nonce"],
-            "timestamp" : request.form["timestamp"]
-        }
-    )
-    return {"ok":True}
+    add_message_to_mailbox(MAILBOX_PATH, 
+                            username,
+                            request.form["from"],
+                            request.form["ciphertext"],
+                            request.form["encrypted_aes_key"],
+                            request.form["nonce"],
+                            request.form["timestamp"]
+                        )
+    return {"ok": True}
 
 
 @app.route('/collect/<username>', methods=["POST"])
 def collect(username):
-    messages = mailbox.get(username, [])
-    mailbox[username] = []   # clear 'cache'
-
-    return {"messages": messages}
-
-
+    return {"messages": return_user_messages(MAILBOX_PATH, username)}
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 6000)), debug=False)
