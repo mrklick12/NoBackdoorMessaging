@@ -33,12 +33,18 @@ except Exception as e:
         return hed + error_text
 """
 
+def _load_mailboxes(filepath):
+    # Handles three states: no file yet, a file that's present but empty or a file with stuff
+    if not os.path.exists(filepath):
+        return {}
+    with open(filepath, "r") as f:
+        content = f.read()
+    if not content.strip():
+        return {}
+    return json.loads(content)
+
 def add_message_to_mailbox(filepath, toUser, sender, ciphertext, encrypted_key, nonce, timestamp):
-    if os.path.exists(filepath):
-        with open(filepath, "r") as f:
-            mailboxes = json.load(f)
-    else:
-        mailboxes = {}
+    mailboxes = _load_mailboxes(filepath)
 
     if toUser not in mailboxes:
         mailboxes[toUser] = []
@@ -58,11 +64,7 @@ def add_message_to_mailbox(filepath, toUser, sender, ciphertext, encrypted_key, 
     return True
 
 def return_user_messages(filepath, toUser):
-    if os.path.exists(filepath):
-        with open(filepath, "r") as f:
-            mailboxes = json.load(f)
-    else:
-        mailboxes = {}
+    mailboxes = _load_mailboxes(filepath)
 
     messages = mailboxes.get(toUser, [])
     mailboxes[toUser] = [] # clear 'cache'

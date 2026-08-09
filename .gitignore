@@ -10,8 +10,9 @@ logs/
 config.json
 *.pem
 
-# relay's public-key store
-relay/relay.db
+# relay's public-key store and mailbox (both generated at runtime)
+relay/database.db
+relay/mailboxes.json
 instance/
 
 .venv/
