@@ -1,9 +1,10 @@
 __pycache__/
 *.pyc
 
-# per-instance private state (keys, decrypted logs, config) — never commit these
+# per-instance private state
 alice_data/
 bob_data/
+eva_data/
 *_data/
 keys/
 logs/
