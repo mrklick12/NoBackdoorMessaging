@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 
+.vscode/
+
 # per-instance private state
 alice_data/
 bob_data/
