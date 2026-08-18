@@ -7,6 +7,7 @@ YouTube Walkthrough of the Project: https://youtu.be/FYE3b5eEam8
 
 <img width="1904" height="1016" alt="main" src="https://github.com/user-attachments/assets/3825ae7a-90b8-4b03-b198-221c1367af0d" />
 
+### This was programmed within a 48 hour hackathon. Updates may be made afterwards.
 
 ## Inspiration
 
